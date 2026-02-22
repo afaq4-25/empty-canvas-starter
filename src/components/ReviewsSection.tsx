@@ -9,6 +9,12 @@ interface ReviewsSectionProps {
   onSelectArtist: (id: string | null) => void;
 }
 
+const mockPhotos = [
+  'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1622288432450-277d0fef5ed6?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1585747860019-8e8e13c2e4f2?w=400&h=400&fit=crop',
+];
+
 const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: ReviewsSectionProps) => {
   const [isJiggling, setIsJiggling] = useState(false);
   const [pillStyle, setPillStyle] = useState<{ left: number; width: number } | null>(null);
@@ -26,12 +32,6 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
     ? (filteredReviews.reduce((sum, r) => sum + r.rating, 0) / filteredReviews.length).toFixed(1)
     : '0.0';
 
-  const reviewPhotos = [
-    'https://images.unsplash.com/photo-1585747860019-8e8e13c2e4f2?w=300&h=300&fit=crop',
-    'https://images.unsplash.com/photo-1622288432450-277d0fef5ed6?w=300&h=300&fit=crop',
-  ];
-
-  // Measure pill position behind active tab
   const updatePillPosition = useCallback(() => {
     const key = selectedArtist ?? '_all';
     const btn = buttonRefs.current.get(key);
@@ -74,15 +74,17 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
       {/* Section Header */}
       <div className="px-5 pt-6 pb-1">
         <div className="flex items-baseline justify-between mb-4">
-          <h2 className="font-serif text-xl text-truffle italic tracking-wide">Our Stylists</h2>
-          <button className="text-[11px] font-sans font-semibold text-bronze uppercase tracking-[0.12em]">
+          <h2 style={{ fontFamily: "'Playfair Display', serif" }} className="text-xl italic tracking-wide" >
+            <span style={{ color: '#2C1E1A' }}>Our </span>
+            <span style={{ color: '#9A7B6D' }}>Stylists</span>
+          </h2>
+          <button className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#9A7B6D' }}>
             View All
           </button>
         </div>
 
-        {/* ─── Jelly Tab Artist Selector ─── */}
+        {/* Jelly Tab Artist Selector */}
         <div className="relative" ref={tabRowRef}>
-          {/* Sliding pill that extends down to connect with the reviews container */}
           {pillStyle && (
             <div
               className="absolute pointer-events-none"
@@ -91,8 +93,8 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
                 width: pillStyle.width,
                 top: -4,
                 bottom: -16,
-                background: 'hsl(var(--champagne) / 0.6)',
-                border: '1.5px solid hsl(var(--bronze) / 0.15)',
+                background: 'rgba(248, 241, 233, 0.6)',
+                border: '1.5px solid rgba(154, 123, 109, 0.15)',
                 borderBottom: 'none',
                 borderTopLeftRadius: 20,
                 borderTopRightRadius: 20,
@@ -107,36 +109,38 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
           )}
 
           <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-3 items-end justify-center relative z-10">
-            {/* "All" button */}
             <button
               ref={setRef('_all')}
               onClick={() => handleSelect(null)}
               className="flex flex-col items-center gap-1.5 flex-shrink-0"
             >
               <div
-                className={`rounded-full bg-champagne flex items-center justify-center text-[11px] font-sans font-bold text-truffle border-2 transition-all duration-300 ease-out ${
+                className={`rounded-full flex items-center justify-center text-[11px] font-bold border-2 transition-all duration-300 ease-out ${
                   !selectedArtist
-                    ? 'w-[68px] h-[68px] border-bronze shadow-lg'
-                    : 'w-14 h-14 border-transparent opacity-50'
+                    ? 'w-[68px] h-[68px] shadow-lg'
+                    : 'w-14 h-14 opacity-50'
                 }`}
-                style={
-                  !selectedArtist && isJiggling
-                    ? { animation: 'jelly 0.55s ease', transformOrigin: 'bottom center' }
-                    : undefined
-                }
+                style={{
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  background: '#F8F1E9',
+                  color: '#2C1E1A',
+                  borderColor: !selectedArtist ? '#9A7B6D' : 'transparent',
+                  ...((!selectedArtist && isJiggling) ? { animation: 'jelly 0.55s ease', transformOrigin: 'bottom center' } : {}),
+                }}
               >
                 ALL
               </div>
               <span
-                className={`text-[10px] font-sans font-medium uppercase tracking-wider transition-colors duration-200 ${
-                  !selectedArtist ? 'text-truffle' : 'text-bronze/40'
-                }`}
+                className="text-[10px] font-medium uppercase tracking-wider transition-colors duration-200"
+                style={{
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  color: !selectedArtist ? '#2C1E1A' : 'rgba(154,123,109,0.4)',
+                }}
               >
                 All Artists
               </span>
             </button>
 
-            {/* Artist buttons */}
             {artists.map((artist) => {
               const isActive = selectedArtist === artist.id;
               return (
@@ -148,22 +152,21 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
                 >
                   <div
                     className={`rounded-full overflow-hidden border-2 transition-all duration-300 ease-out ${
-                      isActive
-                        ? 'w-[68px] h-[68px] border-bronze shadow-lg'
-                        : 'w-14 h-14 border-transparent opacity-50'
+                      isActive ? 'w-[68px] h-[68px] shadow-lg' : 'w-14 h-14 opacity-50'
                     }`}
-                    style={
-                      isActive && isJiggling
-                        ? { animation: 'jelly 0.55s ease', transformOrigin: 'bottom center' }
-                        : undefined
-                    }
+                    style={{
+                      borderColor: isActive ? '#9A7B6D' : 'transparent',
+                      ...((isActive && isJiggling) ? { animation: 'jelly 0.55s ease', transformOrigin: 'bottom center' } : {}),
+                    }}
                   >
                     <img src={artist.avatar} alt={artist.name} className="w-full h-full object-cover" />
                   </div>
                   <span
-                    className={`text-[10px] font-sans font-medium uppercase tracking-wider whitespace-nowrap transition-colors duration-200 ${
-                      isActive ? 'text-truffle' : 'text-bronze/40'
-                    }`}
+                    className="text-[10px] font-medium uppercase tracking-wider whitespace-nowrap transition-colors duration-200"
+                    style={{
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      color: isActive ? '#2C1E1A' : 'rgba(154,123,109,0.4)',
+                    }}
                   >
                     {artist.name}
                   </span>
@@ -174,33 +177,43 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
         </div>
       </div>
 
-      {/* ─── Reviews Container (glass, visually connected to pill above) ─── */}
+      {/* Reviews Container */}
       <div
-        className="mx-3 glass-orange p-1"
+        className="mx-3 p-1"
         style={{
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
+          background: 'rgba(248, 241, 233, 0.5)',
+          border: '1px solid rgba(154, 123, 109, 0.1)',
+          borderRadius: '0 0 24px 24px',
+          borderTop: 'none',
+          backdropFilter: 'blur(8px)',
           animation: isJiggling ? 'jelly-container 0.5s ease' : 'none',
           transformOrigin: 'top center',
         }}
       >
-        {/* Reviews header inside the glass */}
+        {/* Reviews header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <h3 className="font-serif text-lg text-truffle">
+          <h3 style={{ fontFamily: "'Playfair Display', serif", color: '#2C1E1A' }} className="text-lg">
             {currentArtist ? (
               <>
                 {currentArtist.name.split('.')[0]}.{' '}
-                <span className="text-bronze italic">Reviews</span>
+                <span style={{ color: '#9A7B6D' }} className="italic">Reviews</span>
               </>
             ) : (
               <>
-                All <span className="text-bronze italic">Reviews</span>
+                All <span style={{ color: '#9A7B6D' }} className="italic">Reviews</span>
               </>
             )}
           </h3>
-          <div className="flex items-center gap-1.5 bg-card rounded-full px-2.5 py-1">
-            <Star size={12} className="text-bronze fill-bronze" />
-            <span className="text-sm font-sans font-bold text-truffle">{avgRating}</span>
+          <div
+            className="flex items-center gap-1.5 rounded-full px-2.5 py-1"
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid #EEE6E2',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+            }}
+          >
+            <Star size={12} style={{ color: '#9A7B6D' }} fill="#9A7B6D" />
+            <span className="text-sm font-bold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2C1E1A' }}>{avgRating}</span>
           </div>
         </div>
 
@@ -209,58 +222,86 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
           {filteredReviews.map((review, index) => (
             <div
               key={review.id}
-              className="bg-card rounded-[32px] p-5 border border-border"
+              className="rounded-[32px] p-6 shadow-sm"
               style={{
-                animation: `fade-in-up 0.4s ease-out ${index * 80}ms both`,
+                background: '#FFFFFF',
+                border: '1px solid #EEE6E2',
+                animation: `fade-in-up 0.4s ease-out ${index * 100}ms both`,
               }}
             >
-              {/* Header */}
+              {/* Top Row */}
               <div className="flex items-start justify-between mb-2.5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-champagne flex items-center justify-center flex-shrink-0 border border-border">
-                    <span className="font-serif text-base font-semibold text-truffle">
+                  {/* Letter Avatar */}
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: '#F8F1E9', border: '1px solid #EEE6E2' }}
+                  >
+                    <span style={{ fontFamily: "'Playfair Display', serif", color: '#9A7B6D' }} className="text-base font-semibold">
                       {review.userName.charAt(0)}
                     </span>
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-sans font-semibold text-sm text-truffle">{review.userName}</span>
-                      <CheckCircle2 size={14} className="text-bronze fill-bronze/20" />
+                      <span className="font-semibold text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#2C1E1A' }}>
+                        {review.userName}
+                      </span>
+                      <CheckCircle2 size={14} style={{ color: '#9A7B6D' }} fill="rgba(154,123,109,0.2)" />
                     </div>
+                    {/* Star Rating */}
                     <div className="flex items-center gap-0.5 mt-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
                           size={11}
-                          className={i < review.rating ? 'text-bronze fill-bronze' : 'text-border'}
+                          fill={i < review.rating ? '#9A7B6D' : '#F4EDE9'}
+                          style={{ color: i < review.rating ? '#9A7B6D' : '#F4EDE9' }}
                         />
                       ))}
                     </div>
                   </div>
                 </div>
-                <span className="text-[10px] font-sans text-bronze/60 uppercase tracking-wider whitespace-nowrap">
+                {/* Date */}
+                <span
+                  className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#D1C2BA' }}
+                >
                   {review.date}
                 </span>
               </div>
 
-              {/* Service tag */}
+              {/* Service Tag */}
               <div className="mb-2.5">
-                <span className="inline-flex items-center gap-1 text-[10px] font-sans font-semibold text-truffle uppercase tracking-wider bg-champagne border border-border px-3 py-1 rounded-full">
-                  <Sparkles size={10} className="text-bronze" />
+                <span
+                  className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider rounded-xl px-3 py-1.5"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    background: 'rgba(248, 241, 233, 0.8)',
+                    color: '#9A7B6D',
+                  }}
+                >
+                  <Sparkles size={10} style={{ color: '#9A7B6D' }} />
                   {review.service}
                 </span>
               </div>
 
-              {/* Review text */}
-              <p className="text-[13px] font-sans text-truffle/80 leading-relaxed italic">
+              {/* Comment */}
+              <p
+                className="text-xs font-medium leading-relaxed"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#5C5450' }}
+              >
                 &ldquo;{review.text}&rdquo;
               </p>
 
-              {/* Customer photos */}
+              {/* Customer Photos */}
               {review.hasPhoto && (
-                <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide">
-                  {reviewPhotos.map((photo, i) => (
-                    <div key={i} className="w-40 h-40 flex-shrink-0 rounded-3xl overflow-hidden">
+                <div className="flex gap-2 mt-3 overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                  {mockPhotos.map((photo, i) => (
+                    <div
+                      key={i}
+                      className="w-48 h-48 flex-shrink-0 rounded-3xl overflow-hidden shadow-sm"
+                      style={{ border: '2px solid #FFFFFF' }}
+                    >
                       <img src={photo} alt={`Review photo ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                   ))}
@@ -269,16 +310,19 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
             </div>
           ))}
 
-          {/* Empty state */}
+          {/* Empty State */}
           {filteredReviews.length === 0 && (
             <div className="text-center py-14 px-6">
-              <div className="w-14 h-14 rounded-full bg-card flex items-center justify-center mx-auto mb-3 border border-border">
-                <Star size={20} className="text-bronze/30" />
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
+                style={{ background: '#FFFFFF', border: '1px solid #EEE6E2' }}
+              >
+                <Star size={20} style={{ color: 'rgba(154,123,109,0.3)' }} />
               </div>
-              <p className="font-serif text-base text-bronze/60 italic">
+              <p style={{ fontFamily: "'Playfair Display', serif", color: 'rgba(154,123,109,0.6)' }} className="text-base italic">
                 No reviews yet for this stylist&hellip;
               </p>
-              <p className="text-[11px] font-sans text-bronze/35 mt-2">
+              <p className="text-[11px] mt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'rgba(154,123,109,0.35)' }}>
                 Be the first to share your experience
               </p>
             </div>
